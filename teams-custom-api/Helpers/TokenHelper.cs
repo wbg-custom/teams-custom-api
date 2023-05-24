@@ -41,10 +41,10 @@ namespace teams_custom_api.Helpers
             try
             {
                 ssoToken = ssoToken.Replace("Bearer ", "");
-                string clientId = "cc30ca9f-7ec1-4b9e-a2c1-3141740a0f93";
-                string clientSecret = "DzJ8Q~w5I7fdL-QWdZbf6nMiQl1EjJYUgMmt3cQL";
-                //string clientId = "e4f30e80-248c-4421-9ff8-ec1050d877b0";
-                //string clientSecret = "nfA8Q~UHDX8h1txyFzOJCFymoRFuPRlIdvxrxb~a";
+                //string clientId = "cc30ca9f-7ec1-4b9e-a2c1-3141740a0f93";
+                //string clientSecret = "DzJ8Q~w5I7fdL-QWdZbf6nMiQl1EjJYUgMmt3cQL";
+                string clientId = "e4f30e80-248c-4421-9ff8-ec1050d877b0";
+                string clientSecret = "nfA8Q~UHDX8h1txyFzOJCFymoRFuPRlIdvxrxb~a";
                 string tenantId = "7f611e52-fc16-4e0c-b873-87b7705ddd43";
                 string aadInstance = "https://login.microsoftonline.com/{0}";
                 string authority = string.Format(CultureInfo.InvariantCulture, aadInstance, tenantId);

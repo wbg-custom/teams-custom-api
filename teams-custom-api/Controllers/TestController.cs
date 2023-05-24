@@ -38,7 +38,7 @@ namespace teams_custom_api.Controllers
                 else
                 {
                     Response.StatusCode = (int)HttpStatusCode.OK;
-                    return Json($"Success: {JsonSerializer.Serialize(testPostModel)}");
+                    return Json($"Success: PostData: {JsonSerializer.Serialize(testPostModel)} {System.Environment.NewLine}Token:{tokenObj.Item2}");
                 }
             }
         }
