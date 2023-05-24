@@ -19,7 +19,7 @@ namespace teams_custom_api.Controllers
 
         [HttpPost]
         [Route("/test/post")]
-        public JsonResult Index(TestPostModel testPostModel)
+        public async Task<JsonResult> IndexAsync(TestPostModel testPostModel)
         {
             StringValues stringValue;
             if(!Request.Headers.TryGetValue("Authorization", out stringValue))
@@ -29,7 +29,7 @@ namespace teams_custom_api.Controllers
             }
             else
             {
-                Tuple<bool, string> tokenObj = TokenHelper.GetAccessToken_MSAL(stringValue, "api://teamscustomapp.azurewebsites.net/e4f30e80-248c-4421-9ff8-ec1050d877b0");
+                Tuple<bool, string> tokenObj = await TokenHelper.GetAccessToken_FromSSO(stringValue, "https://wbgcustomoutlook.onmicrosoft.com");
                 if (!tokenObj.Item1)
                 {
                     Response.StatusCode = (int)HttpStatusCode.Unauthorized;
