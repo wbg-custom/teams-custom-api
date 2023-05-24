@@ -48,11 +48,10 @@ namespace teams_custom_api.Helpers
 
                 IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(clientId)
                                                 .WithClientSecret(clientSecret)
-                                                .WithAuthority($"https://login.microsoftonline.com/{tenantId}")
+                                                .WithAuthority(authority)
                                                 .Build();
 
-                var idToken = ssoToken;
-                UserAssertion assert = new UserAssertion(idToken);
+                UserAssertion assert = new UserAssertion(ssoToken);
                 List<string> scopes = new List<string>();
                 scopes.Add("https://graph.microsoft.com/User.Read");
                 // Acquires an access token for this application (usually a Web API) from the authority configured in the application.
