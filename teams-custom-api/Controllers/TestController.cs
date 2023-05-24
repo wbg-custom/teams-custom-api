@@ -29,7 +29,7 @@ namespace teams_custom_api.Controllers
             }
             else
             {
-                Tuple<bool, string> tokenObj = await TokenHelper.GetAccessToken_FromSSO(stringValue, "https://wbgcustomoutlook.onmicrosoft.com");
+                Tuple<bool, string> tokenObj = await TokenHelper.GetAccessToken_FromSSO(stringValue.ToString(), "https://wbgcustomoutlook.onmicrosoft.com");
                 if (!tokenObj.Item1)
                 {
                     Response.StatusCode = (int)HttpStatusCode.Unauthorized;
