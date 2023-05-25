@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "UploadPhoto";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .login {
+        text-align: center;
+        height: '450px';
+        width: '450px';
+    }
+    .wd180px{width: 180px;}
+    .wd200px {
+        width: 180px;
+    }
+</style>
+
+<script>
+    microsoftTeams.initialize();
+    function btnClick() {
+        var file = document.forms["uploadForm"]["photoFile"].files[0];
+        var fileName = document.forms["uploadForm"]["photoFile"].files[0].name;
+        var reader = new FileReader();
+        reader.onloadend = function() {
+            //console.log('RESULT', reader.result);
+            var photoInfo = {
+                photoName: document.forms["uploadForm"]["photoName"].value,
+                photoFile: reader.result,
+                photoFileName: fileName
+            }
+            microsoftTeams.tasks.submitTask(photoInfo);
+            return true;
+        }
+        reader.readAsDataURL(file);
+        document.getElementById('uploadForm').style.display = "none";
+        document.getElementById('dvLoading').style.display = "block";
+    }</script>
+
+<div class="surface theme-light">
+    <div class="panel">
+        <div class="login">
+            <h2>Upload Photo</h2><br>
+            <form method="POST" id="uploadForm" onSubmit="return validateForm()">
+                <table cellspacing="10">
+                    <tr>
+                        <td class="wd180px" align="left">
+                            <label>                    
+                                <b> Photo Name:</b>
+                            </label>
+                        </td>
+                        <td class="wd200px" align="left">
+                            <input type="text" placeholder="Photo Name" name="photoName">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="wd180px" align="left">
+                            <label>
+                                <b>Select Photo:</b>
+                            </label>
+                        </td>
+                        <td class="wd200px" align="left">
+                            <input type="file" placeholder="Select Photo" name="photoFile">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td align="left">
+                            <input type="button" value="Submit" onclick="btnClick()" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <div id="dvLoading" style="display:none;">
+                <img src="https://7aa4-103-170-81-179.in.ngrok.io/images/loading-load.gif" alt="Loading..." />
+            </div>
+        </div>
+    </div>
+</div>
