@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.BotBuilderSamples.Bots;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Bot.Connector.Authentication;
-using System;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -27,8 +26,6 @@ namespace Microsoft.BotBuilderSamples
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
-            services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.FromSeconds(600));
             services.AddHttpClient().AddControllers().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.MaxDepth = HttpHelper.BotMessageSerializerSettings.MaxDepth;
@@ -43,14 +40,6 @@ namespace Microsoft.BotBuilderSamples
 
             // Create the Bot Adapter with error handling enabled.
             services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
-
-            //// The Dialog that will be run by the bot.
-            //services.AddSingleton<MainDialog>();
-
-            //// Register the Token Exchange Helper, for processing TokenExchangeOperation Invoke Activities 
-            //services.AddSingleton<TokenExchangeHelper>();
-
-            services.AddHttpContextAccessor();
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
             services.AddTransient<IBot, TeamsMessagingExtensionsSearchAuthConfigBot>();

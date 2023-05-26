@@ -1,5 +1,17 @@
-﻿namespace TeamsMessagingExtensionsSearchAuthConfig.Constants
+﻿using System;
+
+namespace TeamsMessagingExtensionsSearchAuthConfig.Constants
 {
+    public class Constantscs
+    {
+    }
+    public class AzureCredentials
+    {
+        public static string? AadClientID { get { return Environment.GetEnvironmentVariable("AadClientID"); } }
+        public static string? AadClientSecret { get { return Environment.GetEnvironmentVariable("AadClientSecret"); } }
+        public static string? AadTenantId { get { return Environment.GetEnvironmentVariable("AadTenantId"); } }
+        public static string AadInstance { get { return "https://login.microsoftonline.com/{0}"; } }
+    }
     public static class OneDriveConstants
     {
         private static string _siteUrl { get { return "https://graph.microsoft.com/v1.0/me"; } }

@@ -1,10 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
-  "version": "1.1.6",
+  "version": "1.1.8",
   "manifestVersion": "1.16",
   "id": "62f80a1d-8559-434a-9989-7718500e72cd",
   "packageName": "com.package.name",
-  "name": { "short": "Custom Tabs & Extensions", "full": "" },
+  "name": {
+    "short": "Custom Tabs & Extensions",
+    "full": ""
+  },
   "developer": {
     "name": "Custom Tabs and Extensions",
     "mpnId": "",
@@ -16,14 +19,23 @@
     "short": "Custom tabs and extensions",
     "full": "This app is to explore the features of custom app and extensions."
   },
-  "icons": { "outline": "outline.png", "color": "color.png" },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
   "accentColor": "#FFFFFF",
   "configurableTabs": [
     {
       "configurationUrl": "https://teamscustomapp.azurewebsites.net/index.html#/grouptabconfig",
       "canUpdateConfiguration": true,
-      "scopes": ["groupChat", "team"],
-      "context": ["channelTab", "privateChatTab"]
+      "scopes": [
+        "groupChat",
+        "team"
+      ],
+      "context": [
+        "channelTab",
+        "privateChatTab"
+      ]
     }
   ],
   "staticTabs": [
@@ -31,10 +43,19 @@
       "entityId": "8882efc5-85ab-4607-8e22-2f2b102ea9e4",
       "name": "Custom Tab",
       "contentUrl": "https://teamscustomapp.azurewebsites.net/index.html#/personaltabhome",
-      "scopes": ["personal"],
-      "context": ["personalTab"]
+      "scopes": [
+        "personal"
+      ],
+      "context": [
+        "personalTab"
+      ]
     },
-    { "entityId": "about", "scopes": ["personal"] }
+    {
+      "entityId": "about",
+      "scopes": [
+        "personal"
+      ]
+    }
   ],
   "composeExtensions": [
     {
@@ -47,7 +68,11 @@
           "description": "Perform a search",
           "initialRun": true,
           "fetchTask": false,
-          "context": ["commandBox", "compose", "message"],
+          "context": [
+            "commandBox",
+            "compose",
+            "message"
+          ],
           "parameters": [
             {
               "name": "searchQuery",
@@ -56,6 +81,17 @@
               "inputType": "text"
             }
           ]
+        },
+        {
+          "id": "UPLOADPHOTO",
+          "type": "action",
+          "title": "Upload",
+          "description": "Upload Photo in OneDrive",
+          "initialRun": true,
+          "fetchTask": false,
+          "context": [
+            "compose"
+          ]
         }
       ],
       "canUpdateConfiguration": true,
@@ -63,26 +99,50 @@
         {
           "type": "link",
           "value": {
-            "domains": ["*.botframework.com"],
+            "domains": [
+              "*.botframework.com",
+              "teamscustomapp.azurewebsites.net",
+              "customteamsapi.azurewebsites.net"
+            ],
             "supportsAnonymizedPayloads": false
           }
         }
       ]
     }
   ],
-  "validDomains": ["teamscustomapp.azurewebsites.net", "*.botframework.com"],
+  "validDomains": [
+    "teamscustomapp.azurewebsites.net",
+    "customteamsapi.azurewebsites.net",
+    "*.botframework.com",
+    "*.githubusercontent.com"
+  ],
   "webApplicationInfo": {
     "id": "e4f30e80-248c-4421-9ff8-ec1050d877b0",
     "resource": "api://teamscustomapp.azurewebsites.net/e4f30e80-248c-4421-9ff8-ec1050d877b0"
   },
-  "devicePermissions": ["geolocation", "media", "notifications"],
-  "meetingExtensionDefinition": { "scenes": [], "supportsStreaming": true },
+  "devicePermissions": [
+    "geolocation",
+    "media",
+    "notifications"
+  ],
+  "meetingExtensionDefinition": {
+    "scenes": [
+    ],
+    "supportsStreaming": true
+  },
   "authorization": {
     "permissions": {
-      "orgWide": [],
+      "orgWide": [
+      ],
       "resourceSpecific": [
-        { "name": "ChannelMeeting.ReadBasic.Group", "type": "Delegated" },
-        { "name": "ChannelMeetingParticipant.Read.Group", "type": "Delegated" }
+        {
+          "name": "ChannelMeeting.ReadBasic.Group",
+          "type": "Delegated"
+        },
+        {
+          "name": "ChannelMeetingParticipant.Read.Group",
+          "type": "Delegated"
+        }
       ]
     }
   }
