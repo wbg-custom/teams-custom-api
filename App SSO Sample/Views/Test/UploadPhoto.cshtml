@@ -1,0 +1,97 @@
+﻿@{
+    ViewData["Title"] = "UploadPhoto";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .popupPanel {
+        text-align: center;
+        height: 300px;
+        width: 100%;
+        margin: auto;
+    }
+
+    .wd100per {
+        width: 100%;
+    }
+
+    .wd180px {
+        width: 180px;
+    }
+
+    .wd200px {
+        width: 180px;
+    }
+
+    #tdMessage {
+        color: red;
+    }
+</style>
+
+<script>
+    microsoftTeams.initialize();
+    function btnClick() {
+        var tdMsg = document.getElementById("tdMessage");
+        var photoName = document.getElementById("txtPhotoName").value;
+        var file = document.forms["uploadForm"]["photoFile"].files[0];
+        if (!file) {
+            tdMsg.innerHTML = "Please select image.";
+        }
+        else if (photoName == '') {
+            tdMsg.innerHTML = "Please enter image name.";
+        }
+        else {
+            tdMsg.innerHTML = "";
+            var fileName = file.name;
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                //console.log('RESULT', reader.result);
+                var photoInfo = {
+                    photoName: photoName,
+                    photoFile: reader.result,
+                    photoFileName: fileName
+                }
+                microsoftTeams.tasks.submitTask(photoInfo);
+                return true;
+            }
+            reader.readAsDataURL(file);
+            document.getElementById('uploadForm').style.display = "none";
+            document.getElementById('dvLoading').style.display = "block";
+        }
+    }
+</script>
+
+<div class="surface theme-light">
+    <div class="popupPanel">
+        <h2>Upload Photo</h2><br>
+        <form method="POST" id="uploadForm" onSubmit="return validateForm()">
+            <table cellspacing="10" class="wd100per">
+                <tr>
+                    <td class="wd100per" align="center">
+                        <input type="text" placeholder="Enter Photo Name" name="txtPhotoName" id="txtPhotoName">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="wd100per" align="center">
+                        <input type="file" placeholder="Select Photo" name="photoFile">
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <input type="button" value="Submit" onclick="btnClick()" />
+                    </td>
+                </tr>
+                <tr>
+                    <td id="tdMessage">
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <div id="dvLoading" style="display:none;">
+            <img src="@(ViewBag.SiteUrl)/images/loading-load.gif" alt="Loading..." />
+        </div>
+    </div>
+
+</div>
+
+

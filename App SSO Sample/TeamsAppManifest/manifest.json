@@ -1,0 +1,179 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "version": "1.3.5",
+  "manifestVersion": "1.16",
+  "id": "62f80a1d-8559-434a-9989-7718500e72cd",
+  "packageName": "com.package.name",
+  "name": {
+    "short": "Custom Tabs and Extensions",
+    "full": ""
+  },
+  "developer": {
+    "name": "Custom Tabs and Extensions",
+    "mpnId": "",
+    "websiteUrl": "https://teamscustomapp.azurewebsites.net",
+    "privacyUrl": "https://teamscustomapp.azurewebsites.net/index.html#/privacy",
+    "termsOfUseUrl": "https://teamscustomapp.azurewebsites.net/index.html#/termsofuse"
+  },
+  "description": {
+    "short": "Custom tabs and extensions",
+    "full": "This app is to explore the features of custom app and extensions."
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#FFFFFF",
+  "configurableTabs": [
+    {
+      "configurationUrl": "https://teamscustomapp.azurewebsites.net/index.html#/grouptabconfig",
+      "canUpdateConfiguration": true,
+      "scopes": [
+        "groupchat",
+        "team"
+      ],
+      "context": [
+        "channelTab",
+        "privateChatTab"
+      ]
+    }
+  ],
+  "staticTabs": [
+    {
+      "entityId": "8882efc5-85ab-4607-8e22-2f2b102ea9e4",
+      "name": "Custom Tab",
+      "contentUrl": "https://localhost:53000/index.html#/tab",
+      "scopes": [
+        "personal"
+      ],
+      "context": [
+        "personalTab"
+      ]
+    },
+    {
+      "entityId": "about",
+      "scopes": [
+        "personal"
+      ]
+    }
+  ],
+  "composeExtensions": [
+    {
+      "botId": "e4f30e80-248c-4421-9ff8-ec1050d877b0",
+      "commands": [
+        {
+          "id": "searchQuery",
+          "type": "query",
+          "title": "Search",
+          "description": "Perform a search",
+          "initialRun": true,
+          "fetchTask": false,
+          "context": [
+            "commandBox",
+            "compose",
+            "message"
+          ],
+          "parameters": [
+            {
+              "name": "searchQuery",
+              "title": "Search",
+              "description": "Your search query",
+              "inputType": "text"
+            }
+          ]
+        },
+        {
+          "id": "UPLOADPHOTO",
+          "type": "action",
+          "title": "Upload",
+          "description": "Upload Photo in OneDrive",
+          "initialRun": false,
+          "fetchTask": true,
+          "context": [
+            "commandBox",
+            "compose"
+          ],
+          "parameters": [
+            {
+              "name": "param",
+              "title": "param",
+              "description": ""
+            }
+          ]
+        },
+        {
+          "id": "SIGNOUTCOMMAND",
+          "type": "action",
+          "title": "SignOut",
+          "description": "Sign Out",
+          "initialRun": false,
+          "fetchTask": true,
+          "context": [
+            "commandBox",
+            "compose"
+          ],
+          "parameters": [
+            {
+              "name": "param",
+              "title": "param",
+              "description": ""
+            }
+          ]
+        }
+      ],
+      "canUpdateConfiguration": true,
+      "messageHandlers": [
+        {
+          "type": "link",
+          "value": {
+            "domains": [
+              "*.botframework.com",
+              "teamscustomapp.azurewebsites.net",
+              "customteamsapi.azurewebsites.net",
+              "*.ngrok-free.app"
+            ],
+            "supportsAnonymizedPayloads": false
+          }
+        }
+      ]
+    }
+  ],
+  "validDomains": [
+    "teamscustomapp.azurewebsites.net",
+    "customteamsapi.azurewebsites.net",
+    "*.botframework.com",
+    "*.githubusercontent.com",
+    "localhost:53000",
+    "*.ngrok-free.app"
+  ],
+  "webApplicationInfo": {
+    "id": "e4f30e80-248c-4421-9ff8-ec1050d877b0",
+    "resource": "api://teamscustomapp.azurewebsites.net/e4f30e80-248c-4421-9ff8-ec1050d877b0"
+  },
+  "devicePermissions": [
+    "geolocation",
+    "media",
+    "notifications"
+  ],
+  "meetingExtensionDefinition": {
+    "scenes": [
+    ],
+    "supportsStreaming": true
+  },
+  "authorization": {
+    "permissions": {
+      "orgWide": [
+      ],
+      "resourceSpecific": [
+        {
+          "name": "ChannelMeeting.ReadBasic.Group",
+          "type": "Delegated"
+        },
+        {
+          "name": "ChannelMeetingParticipant.Read.Group",
+          "type": "Delegated"
+        }
+      ]
+    }
+  }
+}
