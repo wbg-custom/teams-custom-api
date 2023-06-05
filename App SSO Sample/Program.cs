@@ -60,6 +60,7 @@ builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSch
     options.TokenValidationParameters.ValidAudiences = new List<string> { builder.Configuration["AzureAd:ClientId"], builder.Configuration["AzureAd:ApplicationIdURI"].ToUpperInvariant() };
     options.TokenValidationParameters.AudienceValidator = SSOAuthHelper.AudienceValidator;
 });
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
 
 var app = builder.Build();
 
