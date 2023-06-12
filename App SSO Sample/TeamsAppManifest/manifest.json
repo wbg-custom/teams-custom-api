@@ -1,22 +1,22 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
-  "version": "1.3.5",
+  "version": "1.4.4",
   "manifestVersion": "1.16",
   "id": "62f80a1d-8559-434a-9989-7718500e72cd",
   "packageName": "com.package.name",
   "name": {
-    "short": "Custom Tabs and Extensions",
-    "full": ""
+    "short": "WBG Photos QA",
+    "full": "World Bank Group photos app in QA"
   },
   "developer": {
-    "name": "Custom Tabs and Extensions",
+    "name": "World Bank Group",
     "mpnId": "",
     "websiteUrl": "https://teamscustomapp.azurewebsites.net",
     "privacyUrl": "https://teamscustomapp.azurewebsites.net/index.html#/privacy",
     "termsOfUseUrl": "https://teamscustomapp.azurewebsites.net/index.html#/termsofuse"
   },
   "description": {
-    "short": "Custom tabs and extensions",
+    "short": "This is a World Bank Group photos app in QA",
     "full": "This app is to explore the features of custom app and extensions."
   },
   "icons": {
@@ -26,23 +26,30 @@
   "accentColor": "#FFFFFF",
   "configurableTabs": [
     {
-      "configurationUrl": "https://teamscustomapp.azurewebsites.net/index.html#/grouptabconfig",
+      "configurationUrl": "https://ambitious-wave-0db06d610.3.azurestaticapps.net/index.html#/grouptabconfig",
       "canUpdateConfiguration": true,
       "scopes": [
-        "groupchat",
+        "groupChat",
         "team"
       ],
       "context": [
         "channelTab",
-        "privateChatTab"
+        "meetingSidePanel",
+        "meetingStage",
+        "meetingDetailsTab",
+        "meetingChatTab"
+      ],
+      "supportedSharePointHosts": [
+        "sharePointFullPage",
+        "sharePointWebPart"
       ]
     }
   ],
   "staticTabs": [
     {
       "entityId": "8882efc5-85ab-4607-8e22-2f2b102ea9e4",
-      "name": "Custom Tab",
-      "contentUrl": "https://localhost:53000/index.html#/tab",
+      "name": "WBG Photos",
+      "contentUrl": "https://ambitious-wave-0db06d610.3.azurestaticapps.net/index.html#/personaltabhome",
       "scopes": [
         "personal"
       ],
@@ -69,9 +76,7 @@
           "initialRun": true,
           "fetchTask": false,
           "context": [
-            "commandBox",
-            "compose",
-            "message"
+            "compose"
           ],
           "parameters": [
             {
@@ -91,7 +96,8 @@
           "fetchTask": true,
           "context": [
             "commandBox",
-            "compose"
+            "compose",
+            "message"
           ],
           "parameters": [
             {
@@ -139,6 +145,7 @@
     }
   ],
   "validDomains": [
+    "ambitious-wave-0db06d610.3.azurestaticapps.net",
     "teamscustomapp.azurewebsites.net",
     "customteamsapi.azurewebsites.net",
     "*.botframework.com",
@@ -148,12 +155,14 @@
   ],
   "webApplicationInfo": {
     "id": "e4f30e80-248c-4421-9ff8-ec1050d877b0",
-    "resource": "api://teamscustomapp.azurewebsites.net/e4f30e80-248c-4421-9ff8-ec1050d877b0"
+    "resource": "api://ambitious-wave-0db06d610.3.azurestaticapps.net/e4f30e80-248c-4421-9ff8-ec1050d877b0"
   },
   "devicePermissions": [
     "geolocation",
     "media",
-    "notifications"
+    "notifications",
+    "midi",
+    "openExternal"
   ],
   "meetingExtensionDefinition": {
     "scenes": [
@@ -171,6 +180,10 @@
         },
         {
           "name": "ChannelMeetingParticipant.Read.Group",
+          "type": "Delegated"
+        },
+        {
+          "name": "CameraStream.Read.User",
           "type": "Delegated"
         }
       ]
