@@ -16,7 +16,7 @@ namespace TeamsTabSSO.Helpers
             if (objResponse.IsSuccessStatusCode)
             {
                 var jsonObj = JObject.Parse(await objResponse.Content.ReadAsStringAsync());
-                objResult = new Tuple<bool, string>(true, "" + jsonObj["value"][0]["id"]);
+                objResult = new Tuple<bool, string>(true, "" + jsonObj?["value"]?[0]?["id"]);
             }
             else
             {

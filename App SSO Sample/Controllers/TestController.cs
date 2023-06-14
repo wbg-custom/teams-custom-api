@@ -5,7 +5,7 @@ using System.Text.Json;
 using TeamsAuthSSO.Models;
 using TeamsTabSSO.Helpers;
 
-namespace App_SSO_Sample.Controllers
+namespace TeamsAuthSSO.Controllers
 {
     public class TestController : Controller
     {
@@ -50,6 +50,13 @@ namespace App_SSO_Sample.Controllers
 
         [Route("/test/UploadPhoto")]
         public IActionResult UploadPhoto()
+        {
+            ViewBag.SiteUrl = _config.GetValue<string>("SiteUrl");
+            return View();//"UploadPhoto"
+        }
+
+        [Route("/test/msGraphToken")]
+        public IActionResult msGraphToken()
         {
             ViewBag.SiteUrl = _config.GetValue<string>("SiteUrl");
             return View();//"UploadPhoto"

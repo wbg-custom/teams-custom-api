@@ -43,10 +43,10 @@ namespace TeamsTabSSO.Helpers
             {
                 ssoToken = ssoToken.Replace("Bearer ", "");
                 ssoToken = ssoToken.Replace("'", "");
-                string clientId = Constants.AzureCredentials.AadClientID ?? "";
+                string tenantId = Constants.AzureCredentials.AadTenantId ?? "";
+                string clientId = Constants.AzureCredentials.AadClientID ?? "";// + "@" + tenantId;
                 string clientSecret = Constants.AzureCredentials.AadClientSecret ?? "";
                 string aadInstance = Constants.AzureCredentials.AadInstance ?? "";
-                string tenantId = Constants.AzureCredentials.AadTenantId ?? "";
                 string authority = string.Format(CultureInfo.InvariantCulture, aadInstance, tenantId);
 
                 IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(clientId)
@@ -54,11 +54,15 @@ namespace TeamsTabSSO.Helpers
                                                 .WithAuthority(authority)
                                                 .Build();
 
-                UserAssertion assert = new UserAssertion(ssoToken);
+                //UserAssertion assert = new UserAssertion(ssoToken);
+                var assert = new Microsoft.Identity.Client.UserAssertion(ssoToken);
                 List<string> scopes = new List<string>();
-                scopes.Add("https://graph.microsoft.com/User.Read");
+                //scopes.Add($"https://{tenantId}/.default");
+                //scopes.Add("https://graph.microsoft.com/User.Read");
+                //scopes.Add("https://graph.microsoft.com/.default");
                 // Acquires an access token for this application (usually a Web API) from the authority configured in the application.
-                var responseToken = await app.AcquireTokenOnBehalfOf(scopes, assert).ExecuteAsync();
+                scopes.Add($"{audienceUri}/.default");
+                var responseToken = await app.AcquireTokenOnBehalfOf(scopes, assert).ExecuteAsync();//.ConfigureAwait(false);//.GetAwaiter().GetResult();
 
                 objResult = new Tuple<bool, string>(true, responseToken.AccessToken);
 

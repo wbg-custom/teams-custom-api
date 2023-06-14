@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using TeamsAuthSSO.Models;
 using TeamsTabSSO.Constants;
@@ -8,62 +9,58 @@ namespace TeamsTabSSO.Helpers
 {
     public class SharePointHelper
     {
-        public static HttpResponseObj UploadFileSharePoint(string accessToken, string folderName, string fileName, string strFilePath)
+        //public static HttpResponseObj UploadFileSharePoint(string accessToken, string fileName, string strFilePath)
+        //{
+        //    HttpResponseObj objReturn;
+        //    string folderName = Constants.SharePointConstants.FolderName;
+        //    string responseUrl = SharePointConstants.GetUploadFileUrl(folderName, fileName);
+        //    string strResponseJson = APICallHelper.MakeApiUploadFileRequest(responseUrl, accessToken, strFilePath);
+
+        //    objReturn = new HttpResponseObj(true, UtilityHelper.ValidJObject(strResponseJson), HttpStatusCode.OK);
+        //    return objReturn;
+        //}
+        public static HttpResponseObj UploadFileSharePoint(string accessToken, string fileName, byte[] byteArray)
         {
-            HttpResponseObj objReturn;
-
-            string responseUrl = SharePointConstants.GetUploadFileUrl(folderName, fileName);
-            string strResponseJson = APICallHelper.MakeApiUploadFileRequest(responseUrl, accessToken, strFilePath);
-
-            objReturn = new HttpResponseObj(true, UtilityHelper.ValidJObject(strResponseJson), HttpStatusCode.OK);
-            return objReturn;
-        }
-        public static HttpResponseObj UploadFileSharePoint(string accessToken, string folderName, string fileName, byte[] byteArray)
-        {
-            HttpResponseObj objReturn;
-
+            string folderName = Constants.SharePointConstants.FolderName;
             string responseUrl = SharePointConstants.GetUploadFileUrl(folderName, fileName);
             string strResponseJson = APICallHelper.MakeApiUploadFileRequest(responseUrl, accessToken, byteArray);
-
-            objReturn = new HttpResponseObj(true, UtilityHelper.ValidJObject(strResponseJson), HttpStatusCode.OK);
+            HttpResponseObj objReturn = new HttpResponseObj(true, UtilityHelper.ValidJObject(strResponseJson), HttpStatusCode.OK);
             return objReturn;
         }
-        public static Task<Tuple<bool, JObject>> SharePointUploadAsync(string accessToken, string folderID, string fileName, string fileString)
+
+        public static async Task<Tuple<bool, string>> GetSharePointFolderIDAsync(string accessToken)
         {
-            Tuple<bool, JObject> objResult;
-
-            string apiUrl = Constants.OneDriveConstants.OneDriveUploadFileUrl(folderID, fileName);
-
-            var b64 = fileString.Split("base64,")[1];
-            byte[] byteArray = Convert.FromBase64String(b64);
-            WebRequest request = WebRequest.Create(apiUrl);
-            request.Method = "PUT";
-            request.ContentType = "application/octet-stream";
-            request.ContentLength = byteArray.Length;
-            request.Headers.Add("Content-Disposition", $"filename*=UTF-8''{fileName}");
-            request.Headers.Add("Authorization", $"Bearer {accessToken}");
-            Stream dataStream = request.GetRequestStream();
-            dataStream.Write(byteArray, 0, byteArray.Length);
-            dataStream.Close();
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            //((HttpWebResponse)response).StatusDescription.Dump();
-
-            if (response.StatusCode == HttpStatusCode.Created || response.StatusCode == HttpStatusCode.OK)
+            Tuple<bool, string> objResult;
+            HttpClient objClient = new HttpClient();
+            objClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            HttpResponseMessage objResponse = await objClient.GetAsync(Constants.OneDriveConstants.GetOneDriveFolderIDUrl());
+            if (objResponse.IsSuccessStatusCode)
             {
-                string stringData;
-                var encoding = ASCIIEncoding.ASCII;
-                using (var reader = new StreamReader(response.GetResponseStream(), encoding))
-                {
-                    stringData = reader.ReadToEnd();
-                }
-                objResult = new Tuple<bool, JObject>(true, JObject.Parse(stringData));
+                var jsonObj = JObject.Parse(await objResponse.Content.ReadAsStringAsync());
+                objResult = new Tuple<bool, string>(true, "" + jsonObj?["value"]?[0]?["id"]);
             }
             else
             {
-                objResult = new Tuple<bool, JObject>(false, JObject.Parse($"Something went wrong. Please try after sometime. StatusCode:{response.StatusCode}. StatusDescription:{response.StatusDescription}."));
+                objResult = new Tuple<bool, string>(false, $"Message:{objResponse.StatusCode}");
             }
-
-            return Task.FromResult(objResult);
+            return objResult;
+        }
+        public static async Task<Tuple<bool, JObject>> GetSharePointPhotoListAsync(string accessToken, string folderID)
+        {
+            Tuple<bool, JObject> objResult;
+            HttpClient objClient = new HttpClient();
+            objClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            HttpResponseMessage objResponse = await objClient.GetAsync(Constants.OneDriveConstants.GetOneDrivePhotoListUrl(folderID));
+            if (objResponse.IsSuccessStatusCode)
+            {
+                var jsonObj = JObject.Parse(await objResponse.Content.ReadAsStringAsync());
+                objResult = new Tuple<bool, JObject>(true, jsonObj);
+            }
+            else
+            {
+                objResult = new Tuple<bool, JObject>(false, new JObject($"Message:{objResponse.StatusCode}"));
+            }
+            return objResult;
         }
 
     }

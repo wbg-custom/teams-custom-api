@@ -17,6 +17,10 @@ namespace TeamsTabSSO.Constants
         public static string? AadClientSecret => Environment.GetEnvironmentVariable("AadClientSecret");
         public static string? AadTenantId => Environment.GetEnvironmentVariable("AadTenantId");
         public static string AadInstance { get { return "https://login.microsoftonline.com/{0}"; } }
+        public static string Aad1Instance { get { return "https://login.microsoftonline.com/{0}/tokens/OAuth/2"; } }
+        public static string AadSPInstance { get { return "https://accounts.accesscontrol.windows.net/{0}/tokens/OAuth/2"; } }
+        public static string AadSP1Instance { get { return "https://accounts.accesscontrol.windows.net/{0}"; } }
+        public static string AadSP2Instance { get { return "https://login.microsoftonline.com/wbgcustomoutlook.onmicrosoft.com/oauth2/v2.0/token"; } }
     }
     public static class OneDriveConstants
     {
@@ -36,14 +40,19 @@ namespace TeamsTabSSO.Constants
     }
     public static class SharePointConstants
     {
-        private static string _siteUrl { get { return "https://wbgcustomoutlook.sharepoint.com"; } }
+        public static string SharePointsiteUrl { get { return "https://wbgcustomoutlook.sharepoint.com"; } }
+        public static string FolderName { get { return "WBG Phtos"; } }
+        public static string GetOneDriveFolderIDUrl()
+        {
+            return $"{SharePointsiteUrl}/drive/root/search(q='team photos')";
+        }
         public static string GetDownloadFileUrl(string folderName, string fileName)
         {
-            return $"{_siteUrl}/_api/web/GetFolderByServerRelativeUrl('{folderName}')/Files('{fileName}')/$value";
+            return $"{SharePointsiteUrl}/_api/web/GetFolderByServerRelativeUrl('{folderName}')/Files('{fileName}')/$value";
         }
         public static string GetUploadFileUrl(string folderName, string fileName)
         {
-            return $"{_siteUrl}/_api/web/GetFolderByServerRelativeUrl('{folderName}')/Files/Add(url='{fileName}', overwrite=true)";
+            return $"{SharePointsiteUrl}/_api/web/GetFolderByServerRelativeUrl('{folderName}')/Files/Add(url='{fileName}', overwrite=true)";
         }
     }
     public static class AzureSearchConstants

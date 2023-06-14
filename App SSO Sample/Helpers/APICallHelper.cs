@@ -5,12 +5,12 @@ namespace TeamsTabSSO.Helpers
 {
     public class APICallHelper
     {
-        public static string MakeApiUploadFileRequest(string requestUrl, string accessToken, string strFileUrl)
-        {
-            byte[] byteArray = File.ReadAllBytes(strFileUrl);
-            string output = MakeApiUploadFileRequest(requestUrl, accessToken, byteArray);
-            return output;
-        }
+        //public static string MakeApiUploadFileRequest(string requestUrl, string accessToken, string strFileUrl)
+        //{
+        //    byte[] byteArray = File.ReadAllBytes(strFileUrl);
+        //    string output = MakeApiUploadFileRequest(requestUrl, accessToken, byteArray);
+        //    return output;
+        //}
         public static string MakeApiUploadFileRequest(string requestUrl, string accessToken, byte[] byteArray)
         {
             string output = string.Empty;

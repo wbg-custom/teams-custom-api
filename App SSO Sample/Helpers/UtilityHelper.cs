@@ -14,7 +14,25 @@ namespace TeamsTabSSO.Helpers
             telemetryConfiguration.ConnectionString = Constants.Constants.TelemetryConnectionString;
             _telemetryClient = new TelemetryClient(telemetryConfiguration);
         }
-            
+
+        public static string GetTokenFromHeaders(HttpRequest request)
+        {
+            string userAccessToken = string.Empty;
+            try
+            {
+                var headers = request.Headers;
+                if (headers.Any(x => x.Key == "Authorization"))
+                {
+                    userAccessToken = headers.FirstOrDefault(x => x.Key == "Authorization").Value.FirstOrDefault();
+                    userAccessToken = userAccessToken.Replace("bearer", "").Replace("Bearer", "");
+                }
+                return userAccessToken.Trim();
+            }
+            catch
+            {
+                throw;
+            }
+        }
         public static JObject ValidJObject(string stringData)
         {
             try
