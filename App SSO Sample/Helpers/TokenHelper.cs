@@ -59,9 +59,9 @@ namespace TeamsTabSSO.Helpers
                 List<string> scopes = new List<string>();
                 //scopes.Add($"https://{tenantId}/.default");
                 //scopes.Add("https://graph.microsoft.com/User.Read");
-                //scopes.Add("https://graph.microsoft.com/.default");
+                scopes.Add("https://graph.microsoft.com/.default");
                 // Acquires an access token for this application (usually a Web API) from the authority configured in the application.
-                scopes.Add($"{audienceUri}/.default");
+                //scopes.Add($"{audienceUri}/.default");
                 var responseToken = await app.AcquireTokenOnBehalfOf(scopes, assert).ExecuteAsync();//.ConfigureAwait(false);//.GetAwaiter().GetResult();
 
                 objResult = new Tuple<bool, string>(true, responseToken.AccessToken);
@@ -70,7 +70,7 @@ namespace TeamsTabSSO.Helpers
             }
             catch (Exception ex)
             {
-                objResult = new Tuple<bool, string>(false, $"Msg:{ex.Message}, StackTrace:{ex.StackTrace}");
+                objResult = new Tuple<bool, string>(false, $"{ex.Message}");
             }
 
             return objResult;

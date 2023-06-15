@@ -1,4 +1,5 @@
 ﻿using Microsoft.Graph;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
 
@@ -34,7 +35,10 @@ namespace TeamsAuthSSO.Models
     }
 
 
-
+    public class ResponseMessageCls
+    {
+        public string messsage { get; set; }
+    }
     public class MetaDataFields
     {
         public string FieldName { get; set; }
@@ -43,7 +47,34 @@ namespace TeamsAuthSSO.Models
     }
     public class MetaDataInput
     {
-        public List<MetaDataFields> Fields { get; set;}
+        public List<MetaDataFields> Fields { get; set; }
     }
 
+    public class TeamPhotosIndexUploadFile
+    {
+        public List<TeamPhotosIndexFile> value { get; set; }
+    }
+    public class TeamPhotosIndexFile
+    {
+        public string id { get; set; }
+        [JsonProperty(PropertyName = "@search.action")]
+        public string action { get; set; }
+        public string TeamId { get; set; }
+        public string ChannelId { get; set; }
+        public string? ItemId { get; set; }
+        public string Name { get; set; }
+        public string? CreatedBy { get; set; }
+        public List<string>? tags { get; set; }
+        public string fileUrl { get; set; }
+    }
+    public class TeamPhotosIndexSearch
+    {
+        public string search { get; set; }
+        public string? searchFields { get; set; }
+        public string? facets { get; set; }
+        public string? filter { get; set; }
+        public string? orderby { get; set; }
+        public int? skip { get; set; }
+        public int? top { get; set; }
+    }
 }

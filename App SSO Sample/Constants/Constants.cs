@@ -22,6 +22,12 @@ namespace TeamsTabSSO.Constants
         public static string AadSP1Instance { get { return "https://accounts.accesscontrol.windows.net/{0}"; } }
         public static string AadSP2Instance { get { return "https://login.microsoftonline.com/wbgcustomoutlook.onmicrosoft.com/oauth2/v2.0/token"; } }
     }
+    public static class AzureStorageConstants
+    {
+        public static string StorageAccountName { get { return "storageteamscustomapp"; } }
+        public static string BlobContainerName { get { return "wbg-files"; } }
+        public static string ConnectionString { get { return "DefaultEndpointsProtocol=https;AccountName=storageteamscustomapp;AccountKey=Pjw/hKRXyE21uuOpzcEBIhYsTFeuDzwhdt5gzwHDXRBS7JJRlEXfxqzLx3tzF5RDoYBAKY8MDion+AStwmvgMw==;EndpointSuffix=core.windows.net"; } }
+    }
     public static class OneDriveConstants
     {
         private static string _siteUrl { get { return "https://graph.microsoft.com/v1.0/me"; } }
@@ -55,11 +61,13 @@ namespace TeamsTabSSO.Constants
             return $"{SharePointsiteUrl}/_api/web/GetFolderByServerRelativeUrl('{folderName}')/Files/Add(url='{fileName}', overwrite=true)";
         }
     }
-    public static class AzureSearchConstants
+    public static class AzureIndexConstants
     {
-        public static string AzureSearchUrl {  get { return "https://{0}.search.windows.net/indexes/{1}/docs?api-version=2020-06-30"; } }
+        public static string AzureSearchPostUrl {  get { return "https://{0}.search.windows.net/indexes/{1}/docs/search?api-version=2020-06-30"; } }
         public static string AzureSearchPrefix { get { return "search-teams-custom-app"; } }
         public static string AzureSearchIndexName { get { return "team-photos-index"; } }
+        public static string IndexUploadUrl { get { return " https://{0}.search.windows.net/indexes/{1}/docs/index?api-version=2020-06-30"; } }
+        public static string apiKey { get { return "BerXHnJ4X3LgpeQ4ouTRHArwWP4CI2yigYrZEvmgmPAzSeB9qF5j"; } }
     }
 
 

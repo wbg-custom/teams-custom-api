@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using App_SSO_Sample.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Net;
 using TeamsAuthSSO.Models;
 using TeamsTabSSO.Constants;
@@ -16,7 +18,8 @@ namespace TeamsAuthSSO.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> SharePointUpload([FromForm] SharePointUploadInputObj inputObj)
+        [Route("/sharepoint/upload")]
+        public async Task<JsonResult> SharePointUpload([FromForm] FileUploadInputObj inputObj)
         {
             string userAccessToken = UtilityHelper.GetTokenFromHeaders(Request);
             if (string.IsNullOrWhiteSpace(userAccessToken))
@@ -63,6 +66,88 @@ namespace TeamsAuthSSO.Controllers
             {
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 return (Json("Failed! Upload file."));
+            }
+        }
+
+        [HttpPost]
+        [Route("/blobstorage/upload")]
+        public async Task<JsonResult> AzureStorageUpload([FromForm] FileUploadInputObj inputObj)
+        {
+            string userAccessToken = UtilityHelper.GetTokenFromHeaders(Request);
+            if (string.IsNullOrWhiteSpace(userAccessToken))
+            {
+                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                return Json("Failed! Autherization header is missing.");
+            }
+            else if (string.IsNullOrWhiteSpace(inputObj.TeamId))
+            {
+                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                return Json("Failed! TeamId is missing.");
+            }
+            else if (string.IsNullOrWhiteSpace(inputObj.ChannelId))
+            {
+                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                return Json("Failed! ChannelId is missing.");
+            }
+            else if (inputObj.file != null && inputObj.file.Length > 0)
+            {
+                //string spResourceUri = SharePointConstants.SharePointsiteUrl;
+                //Tuple<bool, string> tokenObj = await TokenHelper.GetAccessToken_FromSSO(userAccessToken, spResourceUri);
+
+                //if (tokenObj.Item1)
+                //{
+                    using (var ms = new MemoryStream())
+                    {
+                        inputObj.file.CopyTo(ms);
+                        byte[] fileBytes = ms.ToArray();
+
+                        AzurestorageHelper objAzureStorage = new AzurestorageHelper();
+                        string result = await objAzureStorage.UploadFromBinaryDataAsync($"{inputObj.TeamId}/{inputObj.ChannelId}/{inputObj.file.FileName}", fileBytes);
+                        if (!string.IsNullOrEmpty(result))
+                        {
+                            Response.StatusCode = (int)HttpStatusCode.OK;
+                            inputObj.Name = inputObj.file.FileName;
+                            AzureSearchHelper.AddAzureSearchIndex(inputObj, result);
+                        }
+                        else Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                        return Json(result);
+                    }
+                //}
+                //else
+                //{
+                //    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                //    return (Json(tokenObj.Item2));
+                //}
+            }
+            else
+            {
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return (Json("Failed! Upload file not found."));
+            }
+        }
+
+        [HttpPost]
+        [Route("/blobstorage/fileList")]
+        public async Task<JsonResult> AzureStorageFileList([FromForm] FileUploadInputObj inputObj)
+        {
+            string userAccessToken = UtilityHelper.GetTokenFromHeaders(Request);
+            if (string.IsNullOrWhiteSpace(userAccessToken))
+            {
+                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                return Json("Failed! Autherization header is missing.");
+            }
+            else if (string.IsNullOrWhiteSpace(inputObj.TeamId) && string.IsNullOrWhiteSpace(inputObj.ChannelId))
+            {
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return Json("Failed! Pass TeamId or ChannelId.");
+            }
+            else
+            {
+                
+                Tuple<bool, JObject> value = AzureSearchHelper.GetAzureSearchIndex(inputObj);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(value.Item2);
+
             }
         }
     }
