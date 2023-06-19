@@ -50,8 +50,10 @@ namespace App_SSO_Sample.Helpers
         public static Tuple<bool, JObject> GetAzureSearchIndex(FileUploadInputObj objInputData)
         {
             TeamPhotosIndexSearch objSearchData = new TeamPhotosIndexSearch();
-            objSearchData.search = string.IsNullOrEmpty(objInputData.ChannelId) ? objInputData.TeamId: objInputData.ChannelId;
-            objSearchData.searchFields = string.IsNullOrEmpty(objInputData.ChannelId) ? "TeamId" : "ChannelId";
+            //objSearchData.search = string.IsNullOrEmpty(objInputData.ChannelId) ? objInputData.TeamId: objInputData.ChannelId;
+            //objSearchData.searchFields = string.IsNullOrEmpty(objInputData.ChannelId) ? "TeamId" : "ChannelId";
+            objSearchData.search = "*";
+            objSearchData.filter = string.IsNullOrEmpty(objInputData.ChannelId) ? $"TeamId eq '{objInputData.TeamId}'" : $"ChannelId eq '{objInputData.ChannelId}'";
             string jsonValue = JsonConvert.SerializeObject(objSearchData);
             //StringContent conetnData = new StringContent(jsonValue, System.Text.Encoding.UTF8, "application/json");
 

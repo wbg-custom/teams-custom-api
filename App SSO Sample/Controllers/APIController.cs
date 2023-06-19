@@ -73,13 +73,14 @@ namespace TeamsAuthSSO.Controllers
         [Route("/blobstorage/upload")]
         public async Task<JsonResult> AzureStorageUpload([FromForm] FileUploadInputObj inputObj)
         {
-            string userAccessToken = UtilityHelper.GetTokenFromHeaders(Request);
-            if (string.IsNullOrWhiteSpace(userAccessToken))
-            {
-                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                return Json("Failed! Autherization header is missing.");
-            }
-            else if (string.IsNullOrWhiteSpace(inputObj.TeamId))
+            //string userAccessToken = UtilityHelper.GetTokenFromHeaders(Request);
+            //if (string.IsNullOrWhiteSpace(userAccessToken))
+            //{
+            //    Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            //    return Json("Failed! Autherization header is missing.");
+            //}
+            //else 
+            if (string.IsNullOrWhiteSpace(inputObj.TeamId))
             {
                 Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 return Json("Failed! TeamId is missing.");
@@ -100,13 +101,13 @@ namespace TeamsAuthSSO.Controllers
                     {
                         inputObj.file.CopyTo(ms);
                         byte[] fileBytes = ms.ToArray();
-
+                        string fileName = inputObj.file.FileName;
                         AzurestorageHelper objAzureStorage = new AzurestorageHelper();
-                        string result = await objAzureStorage.UploadFromBinaryDataAsync($"{inputObj.TeamId}/{inputObj.ChannelId}/{inputObj.file.FileName}", fileBytes);
+                        string result = await objAzureStorage.UploadFromBinaryDataAsync($"{inputObj.TeamId}/{inputObj.ChannelId}/{fileName}", fileBytes);
                         if (!string.IsNullOrEmpty(result))
                         {
                             Response.StatusCode = (int)HttpStatusCode.OK;
-                            inputObj.Name = inputObj.file.FileName;
+                            inputObj.Name = fileName;
                             AzureSearchHelper.AddAzureSearchIndex(inputObj, result);
                         }
                         else Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -125,18 +126,76 @@ namespace TeamsAuthSSO.Controllers
                 return (Json("Failed! Upload file not found."));
             }
         }
+        [HttpPost]
+        [Route("/blobstorage/uploadb64")]
+        public async Task<JsonResult> AzureStorageUploadB64([FromForm] FileUploadInputObj inputObj)
+        {
+            //string userAccessToken = UtilityHelper.GetTokenFromHeaders(Request);
+            //if (string.IsNullOrWhiteSpace(userAccessToken))
+            //{
+            //    Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            //    return Json("Failed! Autherization header is missing.");
+            //}
+            //else 
+            if (string.IsNullOrWhiteSpace(inputObj.TeamId))
+            {
+                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                return Json("Failed! TeamId is missing.");
+            }
+            else if (string.IsNullOrWhiteSpace(inputObj.ChannelId))
+            {
+                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                return Json("Failed! ChannelId is missing.");
+            }
+            else if (!string.IsNullOrEmpty(inputObj.base64))
+            {
+                //string spResourceUri = SharePointConstants.SharePointsiteUrl;
+                //Tuple<bool, string> tokenObj = await TokenHelper.GetAccessToken_FromSSO(userAccessToken, spResourceUri);
+
+                //if (tokenObj.Item1)
+                //{
+                //using (var ms = new MemoryStream())
+                //{
+                //    inputObj.file.CopyTo(ms);
+                    byte[] fileBytes = Convert.FromBase64String(inputObj.base64);
+                    string fileName = string.Format("Capture{0:YYYYMMddHHmm}{1}", DateTime.Now, Guid.NewGuid());
+                    AzurestorageHelper objAzureStorage = new AzurestorageHelper();
+                    string result = await objAzureStorage.UploadFromBinaryDataAsync($"{inputObj.TeamId}/{inputObj.ChannelId}/{fileName}", fileBytes);
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        Response.StatusCode = (int)HttpStatusCode.OK;
+                        inputObj.Name = fileName;
+                        AzureSearchHelper.AddAzureSearchIndex(inputObj, result);
+                    }
+                    else Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return Json(result);
+                //}
+                //}
+                //else
+                //{
+                //    Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                //    return (Json(tokenObj.Item2));
+                //}
+            }
+            else
+            {
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return (Json("Failed! Upload file not found."));
+            }
+        }
 
         [HttpPost]
         [Route("/blobstorage/fileList")]
         public async Task<JsonResult> AzureStorageFileList([FromForm] FileUploadInputObj inputObj)
         {
-            string userAccessToken = UtilityHelper.GetTokenFromHeaders(Request);
-            if (string.IsNullOrWhiteSpace(userAccessToken))
-            {
-                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                return Json("Failed! Autherization header is missing.");
-            }
-            else if (string.IsNullOrWhiteSpace(inputObj.TeamId) && string.IsNullOrWhiteSpace(inputObj.ChannelId))
+            //string userAccessToken = UtilityHelper.GetTokenFromHeaders(Request);
+            //if (string.IsNullOrWhiteSpace(userAccessToken))
+            //{
+            //    Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            //    return Json("Failed! Autherization header is missing.");
+            //}
+            //else 
+            if (string.IsNullOrWhiteSpace(inputObj.TeamId) && string.IsNullOrWhiteSpace(inputObj.ChannelId))
             {
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 return Json("Failed! Pass TeamId or ChannelId.");
