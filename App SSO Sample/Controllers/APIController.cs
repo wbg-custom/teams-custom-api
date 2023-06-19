@@ -128,7 +128,7 @@ namespace TeamsAuthSSO.Controllers
         }
         [HttpPost]
         [Route("/blobstorage/uploadb64")]
-        public async Task<JsonResult> AzureStorageUploadB64([FromForm] FileUploadInputObj inputObj)
+        public async Task<JsonResult> AzureStorageUploadB64([FromBody] FileUploadInputObj inputObj)
         {
             //string userAccessToken = UtilityHelper.GetTokenFromHeaders(Request);
             //if (string.IsNullOrWhiteSpace(userAccessToken))
