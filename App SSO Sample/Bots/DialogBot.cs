@@ -4,9 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using AdaptiveCards;
+using App_SSO_Sample.Helpers;
+using Azure;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Teams;
@@ -239,26 +242,82 @@ namespace Microsoft.BotBuilderSamples
                     };
                 }
 
-                string accessToken = tokenResponse.Token;
-                List<(string, string, string, string)> result = await OneDriveHelper.OneDriveTeamPhotosList(accessToken);
+                //string channelId = turnContext.Activity.TeamsGetChannelId();
+                //var data2 = turnContext.Activity.Value;
+                //var data1 = turnContext.Activity.TeamsGetMeetingInfo();
+                var data3 = turnContext.Activity.ChannelData;
+                var data4 = turnContext.Activity.TeamsGetTeamInfo();
 
-                attachments = result.Select(package =>
+                string teamId, channelId;
+                if(data4 != null)
                 {
-                    var previewCard = new ThumbnailCard { Title = package.Item2, Tap = new CardAction { Type = "invoke", Value = package } };
-                    if (!string.IsNullOrEmpty(package.Item3))
-                    {
-                        previewCard.Images = new List<CardImage>() { new CardImage(package.Item3, "Icon") };
-                    }
+                    teamId = data4.AadGroupId;
+                    channelId = data4.Id;
+                }
+                else
+                {
+                    teamId = "";
+                    channelId = data3?.meeting?.id;
+                }
+                //string str2 = turnContext.Activity.TeamsGetSelectedChannelId();
+                //dynamic data = turnContext.Activity.ChannelData;
+                ////TeamDetails teamDetails = await TeamsInfo.GetTeamDetailsAsync(turnContext, turnContext.Activity.TeamsGetTeamInfo().Id);
+                //TeamDetails teamDetails = TeamsInfo.GetTeamDetailsAsync(turnContext, turnContext.Activity.TeamsGetTeamInfo().Id, cancellationToken).Result;
 
-                    var attachment = new MessagingExtensionAttachment
+                //if (teamDetails != null)
+                //{
+                //string accessToken = tokenResponse.Token;
+                //    List<(string, string, string, string)> result = await OneDriveHelper.OneDriveTeamPhotosList(accessToken);
+
+                    FileUploadInputObj objInputData = new FileUploadInputObj()
+                    {
+                        TeamId = teamId,//teamDetails.Id,
+                        ChannelId = channelId, //turnContext.Activity.TeamsGetSelectedChannelId()
+                    };
+                    Tuple<bool, JObject> imgJson = AzureSearchHelper.GetAzureSearchIndex(objInputData);
+                (string, string, string, string) cardActionData;
+                MessagingExtensionAttachment attachment;
+                foreach (var item in imgJson.Item2.GetValue("value"))
+                {
+                    cardActionData = new (item["id"].ToString(), item["Name"].ToString(), item["fileUrl"].ToString(), item["fileUrl"].ToString());
+                    ThumbnailCard previewCard = new ThumbnailCard { 
+                        Title = item["Name"].ToString(), 
+                        Tap = new CardAction { Type = "invoke", Value = cardActionData } 
+                    };
+                    //if (!string.IsNullOrEmpty(package.Item3))
+                    //{
+                    previewCard.Images = new List<CardImage>() { new CardImage(item["fileUrl"].ToString(), "Icon") };
+                    //}
+                    attachment = new MessagingExtensionAttachment()
                     {
                         ContentType = ThumbnailCard.ContentType,
-                        Content = new ThumbnailCard { Title = package.Item2, Images = new List<CardImage>() { new CardImage(package.Item3, "Icon") } },
+                        Content = new ThumbnailCard { 
+                            Title = item["Name"].ToString(), 
+                            Images = new List<CardImage>() { new CardImage(item["fileUrl"].ToString(), "Icon") } 
+                        },
                         Preview = previewCard.ToAttachment()
                     };
+                    attachments.Add(attachment);
+                }
 
-                    return attachment;
-                }).ToList();
+                //attachments = result.Select(package =>
+                //{
+                //    var previewCard = new ThumbnailCard { Title = package.Item2, Tap = new CardAction { Type = "invoke", Value = package } };
+                //    if (!string.IsNullOrEmpty(package.Item3))
+                //    {
+                //        previewCard.Images = new List<CardImage>() { new CardImage(package.Item3, "Icon") };
+                //    }
+
+                //    var attachment = new MessagingExtensionAttachment
+                //    {
+                //        ContentType = ThumbnailCard.ContentType,
+                //        Content = new ThumbnailCard { Title = package.Item2, Images = new List<CardImage>() { new CardImage(package.Item3, "Icon") } },
+                //        Preview = previewCard.ToAttachment()
+                //    };
+
+                //    return attachment;
+                //}).ToList();
+                //}
             }
 
             return new MessagingExtensionResponse
@@ -519,51 +578,117 @@ namespace Microsoft.BotBuilderSamples
         }
         private async Task<MessagingExtensionActionResponse> UploadPhotoSubmitAsync(ITurnContext<IInvokeActivity> turnContext, MessagingExtensionAction action, CancellationToken cancellationToken)
         {
+
+            string teamId, channelId;
             // The user has chosen to create a card by choosing the 'Web View' context menu command.
             UploadFormResponse cardData = JsonConvert.DeserializeObject<UploadFormResponse>(action.Data.ToString());
 
-            // When the Bot Service Auth flow completes, the action.State will contain a magic code used for verification.
-            var state = action.State; // Check the state value
-            var tokenResponse = await GetTokenResponse(turnContext, state, cancellationToken);
-            Tuple<bool, string> objFolderId = await OneDriveHelper.GetOneDriveFolderIDAsync(tokenResponse.Token);
-            //if (objFolderId.Item1) {
-            //    // To Do
-            //}
-            Tuple<bool, JObject> objFileUpload = await OneDriveHelper.UploadOneDrivePhotoAsync(tokenResponse.Token, objFolderId.Item2, cardData.photoFileName, cardData.photoFile);
-
-
-            var imgUrl = objFileUpload.Item2["@microsoft.graph.downloadUrl"].ToString(); //_siteUrl + "/images/images-002.jpg";
-
-            var card = new ThumbnailCard
+            var data3 = turnContext.Activity.ChannelData;
+            var data4 = turnContext.Activity.TeamsGetTeamInfo();
+            if (data4 != null)
             {
-                Title = "Name: " + cardData.photoName,
-                Subtitle = cardData.photoFileName,
-                Text = objFileUpload.Item2["webUrl"].ToString(),
-                Images = new List<CardImage> { new CardImage { Url = imgUrl } },
-                Buttons = new List<CardAction>
+                teamId = data4.AadGroupId;
+                channelId = data4.Id;
+            }
+            else
+            {
+                teamId = "";
+                channelId = data3?.meeting?.id;
+            }
+
+            //var teamDetails = turnContext.Activity.TeamsGetTeamInfo();
+            //TeamDetails teamDetails= await TeamsInfo.GetTeamDetailsAsync(turnContext, turnContext.Activity.TeamsGetTeamInfo().Id, cancellationToken);
+            if (!string.IsNullOrEmpty(channelId))//(teamDetails != null)
+            {
+                //teamId = teamDetails.AadGroupId;
+                //channelId = teamDetails.Id; //turnContext.Activity.TeamsGetSelectedChannelId();
+                //string createdBy = turnContext.Activity
+
+                // When the Bot Service Auth flow completes, the action.State will contain a magic code used for verification.
+                var state = action.State; // Check the state value
+                var tokenResponse = await GetTokenResponse(turnContext, state, cancellationToken);
+                //Tuple<bool, string> objFolderId = await OneDriveHelper.GetOneDriveFolderIDAsync(tokenResponse.Token);
+                string createdBy = UtilityHelper.GetUserNameFromToken(tokenResponse.Token);
+                //if (objFolderId.Item1) {
+                //    // To Do
+                //}
+                //Tuple<bool, JObject> objFileUpload = await OneDriveHelper.UploadOneDrivePhotoAsync(tokenResponse.Token, objFolderId.Item2, cardData.photoFileName, cardData.photoFile);
+                //var imgUrl = objFileUpload.Item2["@microsoft.graph.downloadUrl"].ToString(); //_siteUrl + "/images/images-002.jpg";
+
+                var b64 = cardData.photoFile.Split("base64,")[1];
+                byte[] byteArray = Convert.FromBase64String(b64);
+                string fileName = cardData.photoFileName;
+                AzurestorageHelper objAzureStorage = new AzurestorageHelper();
+                string imgUrl = await objAzureStorage.UploadFromBinaryDataAsync($"{teamId}/{channelId}/{fileName}", byteArray);
+                if (!string.IsNullOrEmpty(imgUrl))
+                {
+                    FileUploadInputObj inputObj = new FileUploadInputObj()
+                    {
+                        ChannelId = channelId,
+                        TeamId = teamId,
+                        CreatedBy = createdBy
+                    };
+                    inputObj.Name = fileName;
+                    AzureSearchHelper.AddAzureSearchIndex(inputObj, imgUrl);
+                }
+
+                var card = new ThumbnailCard
+                {
+                    Title = "Name: " + cardData.photoName,
+                    Subtitle = cardData.photoFileName,
+                    Text = string.Format("TeamId:{0}, ChannelId:{1}, CreatedBy:{2}", teamId, channelId, createdBy),
+                    Images = new List<CardImage> { new CardImage { Url = imgUrl } },
+                    Buttons = new List<CardAction>
                     {
                         new CardAction { Type = ActionTypes.OpenUrl, Title = "Download Image", Value = imgUrl },
-                        new CardAction { Type = ActionTypes.OpenUrl, Title = "OneDrive Url", Value = objFileUpload.Item2["webUrl"] },
+                        new CardAction { Type = ActionTypes.OpenUrl, Title = "Azure Storage Url", Value = imgUrl },
                     },
-            };
+                };
 
-            var attachments = new List<MessagingExtensionAttachment>();
-            attachments.Add(new MessagingExtensionAttachment
-            {
-                Content = card,
-                ContentType = ThumbnailCard.ContentType,
-                Preview = card.ToAttachment(),
-            });
-
-            return new MessagingExtensionActionResponse
-            {
-                ComposeExtension = new MessagingExtensionResult
+                var attachments = new List<MessagingExtensionAttachment>();
+                attachments.Add(new MessagingExtensionAttachment
                 {
-                    AttachmentLayout = "list",
-                    Type = "result",
-                    Attachments = attachments,
-                },
-            };
+                    Content = card,
+                    ContentType = ThumbnailCard.ContentType,
+                    Preview = card.ToAttachment(),
+                });
+
+                return new MessagingExtensionActionResponse
+                {
+                    ComposeExtension = new MessagingExtensionResult
+                    {
+                        AttachmentLayout = "list",
+                        Type = "result",
+                        Attachments = attachments,
+                    },
+                };
+            }
+            else
+            {
+                var card = new ThumbnailCard
+                {
+                    Title = "Photo not uploaded",
+                    Subtitle = "No Upload",
+                    Text = "No upload"
+                };
+                var attachments = new List<MessagingExtensionAttachment>();
+                attachments.Add(new MessagingExtensionAttachment
+                {
+                    Content = card,
+                    ContentType = ThumbnailCard.ContentType,
+                    Preview = card.ToAttachment(),
+                });
+
+                return new MessagingExtensionActionResponse
+                {
+                    ComposeExtension = new MessagingExtensionResult
+                    {
+                        AttachmentLayout = "list",
+                        Type = "result",
+                        Attachments = attachments,
+                    },
+                };
+            }
         }
         #endregion
 

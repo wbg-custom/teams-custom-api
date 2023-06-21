@@ -2,6 +2,8 @@
 using System.Net.Http.Headers;
 using System.Net;
 using System.Text;
+using App_SSO_Sample.Helpers;
+using TeamsAuthSSO.Models;
 
 namespace TeamsTabSSO.Helpers
 {

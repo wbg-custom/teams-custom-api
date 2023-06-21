@@ -1,6 +1,7 @@
 ﻿using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Newtonsoft.Json.Linq;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace TeamsTabSSO.Helpers
 {
@@ -63,6 +64,21 @@ namespace TeamsTabSSO.Helpers
             catch
             {
 
+            }
+        }
+
+        public static string GetUserNameFromToken(string token)
+        {//preferred_username
+            try
+            {
+                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+                var jti = jsonToken?.Claims.First(claim => claim.Type == "preferred_username").Value;
+                return jti ?? "empty";
+            }
+            catch(Exception ex)
+            {
+                return "Ex:"+ex.Message;
             }
         }
     }

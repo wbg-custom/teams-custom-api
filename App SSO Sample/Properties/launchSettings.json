@@ -5,7 +5,8 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "http://localhost:3978"
     },
     "AuthenticationBot": {
       "commandName": "Project",
@@ -21,8 +22,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:3978",
-      "sslPort": 44397
+      "applicationUrl": "http://localhost:3978"
     }
   }
 }

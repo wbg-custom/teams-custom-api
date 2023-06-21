@@ -80,12 +80,13 @@ namespace TeamsAuthSSO.Controllers
             //    return Json("Failed! Autherization header is missing.");
             //}
             //else 
-            if (string.IsNullOrWhiteSpace(inputObj.TeamId))
-            {
-                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                return Json("Failed! TeamId is missing.");
-            }
-            else if (string.IsNullOrWhiteSpace(inputObj.ChannelId))
+            //if (string.IsNullOrWhiteSpace(inputObj.TeamId))
+            //{
+            //    Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            //    return Json("Failed! TeamId is missing.");
+            //}
+            //else 
+            if (string.IsNullOrWhiteSpace(inputObj.ChannelId))
             {
                 Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 return Json("Failed! ChannelId is missing.");
@@ -137,12 +138,13 @@ namespace TeamsAuthSSO.Controllers
             //    return Json("Failed! Autherization header is missing.");
             //}
             //else 
-            if (string.IsNullOrWhiteSpace(inputObj.TeamId))
-            {
-                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                return Json("Failed! TeamId is missing.");
-            }
-            else if (string.IsNullOrWhiteSpace(inputObj.ChannelId))
+            //if (string.IsNullOrWhiteSpace(inputObj.TeamId))
+            //{
+            //    Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            //    return Json("Failed! TeamId is missing.");
+            //}
+            //else 
+            if (string.IsNullOrWhiteSpace(inputObj.ChannelId))
             {
                 Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 return Json("Failed! ChannelId is missing.");
