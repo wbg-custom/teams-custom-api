@@ -19,6 +19,7 @@ using Microsoft.Bot.Schema.Teams;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Graph.ExternalConnectors;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TeamsAuthSSO.Models;
@@ -77,7 +78,7 @@ namespace Microsoft.BotBuilderSamples
             await _dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
         }
 
-        protected async override Task<MessagingExtensionResponse> OnTeamsAppBasedLinkQueryAsync(ITurnContext<IInvokeActivity> turnContext, AppBasedLinkQuery query, CancellationToken cancellationToken)
+        protected async override Task<Microsoft.Bot.Schema.Teams.MessagingExtensionResponse> OnTeamsAppBasedLinkQueryAsync(ITurnContext<IInvokeActivity> turnContext, AppBasedLinkQuery query, CancellationToken cancellationToken)
         {
             var tokenResponse = await GetTokenResponse(turnContext, query.State, cancellationToken);
             if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.Token))
@@ -86,7 +87,7 @@ namespace Microsoft.BotBuilderSamples
                 // Retrieve the OAuth Sign in Link to use in the MessagingExtensionResult Suggested Actions
                 var userTokenClient = turnContext.TurnState.Get<UserTokenClient>();
                 var resource = await userTokenClient.GetSignInResourceAsync(_connectionName, turnContext.Activity as Activity, null, cancellationToken);
-                return new MessagingExtensionResponse
+                return new Microsoft.Bot.Schema.Teams.MessagingExtensionResponse
                 {
                     ComposeExtension = new MessagingExtensionResult
                     {
@@ -247,18 +248,28 @@ namespace Microsoft.BotBuilderSamples
                 //var data1 = turnContext.Activity.TeamsGetMeetingInfo();
                 var data3 = turnContext.Activity.ChannelData;
                 var data4 = turnContext.Activity.TeamsGetTeamInfo();
+                //var data5 = turnContext.Activity.TeamsGetSelectedChannelId();
 
                 string teamId, channelId;
-                if(data4 != null)
-                {
-                    teamId = data4.AadGroupId;
-                    channelId = data4.Id;
-                }
-                else
-                {
-                    teamId = "";
-                    channelId = data3?.meeting?.id;
-                }
+
+                //var teamsContext = turnContext.TurnState.Get<ITeamsContext>();
+                //teamId = teamsContext.Team.Id;
+                //channelId = teamsContext.Channel.Id;
+                //var testStr1 = teamsContext.Team.Name;
+                //var testStr2 = teamsContext.Channel.Name;
+
+
+                //if(data4 != null)
+                //{
+                //    teamId = data4.AadGroupId;
+                //    channelId = data4.Id;
+                //}
+                //else
+                //{
+
+                teamId = data4 != null ? data4.AadGroupId : "";
+                channelId = data3.channel?.id != null ? data3.channel?.id : data3?.meeting?.id;
+                //}
                 //string str2 = turnContext.Activity.TeamsGetSelectedChannelId();
                 //dynamic data = turnContext.Activity.ChannelData;
                 ////TeamDetails teamDetails = await TeamsInfo.GetTeamDetailsAsync(turnContext, turnContext.Activity.TeamsGetTeamInfo().Id);
@@ -269,20 +280,21 @@ namespace Microsoft.BotBuilderSamples
                 //string accessToken = tokenResponse.Token;
                 //    List<(string, string, string, string)> result = await OneDriveHelper.OneDriveTeamPhotosList(accessToken);
 
-                    FileUploadInputObj objInputData = new FileUploadInputObj()
-                    {
-                        TeamId = teamId,//teamDetails.Id,
-                        ChannelId = channelId, //turnContext.Activity.TeamsGetSelectedChannelId()
-                    };
-                    Tuple<bool, JObject> imgJson = AzureSearchHelper.GetAzureSearchIndex(objInputData);
+                FileUploadInputObj objInputData = new FileUploadInputObj()
+                {
+                    TeamId = teamId,//teamDetails.Id,
+                    ChannelId = channelId, //turnContext.Activity.TeamsGetSelectedChannelId()
+                };
+                Tuple<bool, JObject> imgJson = AzureSearchHelper.GetAzureSearchIndex(objInputData);
                 (string, string, string, string) cardActionData;
                 MessagingExtensionAttachment attachment;
                 foreach (var item in imgJson.Item2.GetValue("value"))
                 {
-                    cardActionData = new (item["id"].ToString(), item["Name"].ToString(), item["fileUrl"].ToString(), item["fileUrl"].ToString());
-                    ThumbnailCard previewCard = new ThumbnailCard { 
-                        Title = item["Name"].ToString(), 
-                        Tap = new CardAction { Type = "invoke", Value = cardActionData } 
+                    cardActionData = new(item["id"].ToString(), item["Name"].ToString(), item["fileUrl"].ToString(), item["fileUrl"].ToString());
+                    ThumbnailCard previewCard = new ThumbnailCard
+                    {
+                        Title = item["Name"].ToString(),
+                        Tap = new CardAction { Type = "invoke", Value = cardActionData }
                     };
                     //if (!string.IsNullOrEmpty(package.Item3))
                     //{
@@ -291,9 +303,10 @@ namespace Microsoft.BotBuilderSamples
                     attachment = new MessagingExtensionAttachment()
                     {
                         ContentType = ThumbnailCard.ContentType,
-                        Content = new ThumbnailCard { 
-                            Title = item["Name"].ToString(), 
-                            Images = new List<CardImage>() { new CardImage(item["fileUrl"].ToString(), "Icon") } 
+                        Content = new ThumbnailCard
+                        {
+                            Title = item["Name"].ToString(),
+                            Images = new List<CardImage>() { new CardImage(item["fileUrl"].ToString(), "Icon") }
                         },
                         Preview = previewCard.ToAttachment()
                     };
@@ -585,24 +598,11 @@ namespace Microsoft.BotBuilderSamples
 
             var data3 = turnContext.Activity.ChannelData;
             var data4 = turnContext.Activity.TeamsGetTeamInfo();
-            if (data4 != null)
-            {
-                teamId = data4.AadGroupId;
-                channelId = data4.Id;
-            }
-            else
-            {
-                teamId = "";
-                channelId = data3?.meeting?.id;
-            }
+            teamId = data4 != null ? data4.AadGroupId : "";
+            channelId = data3.channel?.id != null ? data3.channel?.id : data3?.meeting?.id;
 
-            //var teamDetails = turnContext.Activity.TeamsGetTeamInfo();
-            //TeamDetails teamDetails= await TeamsInfo.GetTeamDetailsAsync(turnContext, turnContext.Activity.TeamsGetTeamInfo().Id, cancellationToken);
             if (!string.IsNullOrEmpty(channelId))//(teamDetails != null)
             {
-                //teamId = teamDetails.AadGroupId;
-                //channelId = teamDetails.Id; //turnContext.Activity.TeamsGetSelectedChannelId();
-                //string createdBy = turnContext.Activity
 
                 // When the Bot Service Auth flow completes, the action.State will contain a magic code used for verification.
                 var state = action.State; // Check the state value
@@ -671,8 +671,8 @@ namespace Microsoft.BotBuilderSamples
                     Subtitle = "No Upload",
                     Text = "No upload"
                 };
-                var attachments = new List<MessagingExtensionAttachment>();
-                attachments.Add(new MessagingExtensionAttachment
+                var attachments = new List<Microsoft.Bot.Schema.Teams.MessagingExtensionAttachment>();
+                attachments.Add(new Microsoft.Bot.Schema.Teams.MessagingExtensionAttachment
                 {
                     Content = card,
                     ContentType = ThumbnailCard.ContentType,
@@ -681,7 +681,7 @@ namespace Microsoft.BotBuilderSamples
 
                 return new MessagingExtensionActionResponse
                 {
-                    ComposeExtension = new MessagingExtensionResult
+                    ComposeExtension = new Microsoft.Bot.Schema.Teams.MessagingExtensionResult
                     {
                         AttachmentLayout = "list",
                         Type = "result",
