@@ -74,6 +74,19 @@ namespace Microsoft.BotBuilderSamples
        
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
+            // Gets the details for the given team id. This only works in team scoped conversations.
+            // TeamsGetTeamInfo: Gets the TeamsInfo object from the current activity.
+            TeamDetails teamDetails = await TeamsInfo.GetTeamDetailsAsync(turnContext, turnContext.Activity.TeamsGetTeamInfo().Id, cancellationToken);
+            if (teamDetails != null)
+            {
+                await turnContext.SendActivityAsync($"The groupId is: {teamDetails.AadGroupId}");
+            }
+            else
+            {
+                // Sends a message activity to the sender of the incoming activity.
+                await turnContext.SendActivityAsync($"Message did not come from a channel in a team.");
+            }
+
             _logger.LogInformation("Running dialog with Message Activity.");
             await _dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
         }
@@ -165,6 +178,7 @@ namespace Microsoft.BotBuilderSamples
         {
             var userConfigSettings = await _userConfigProperty.GetAsync(turnContext, () => string.Empty);
             var attachments = new List<MessagingExtensionAttachment>();
+            
 
             if (userConfigSettings.ToUpper().Contains("EMAIL"))
             {
@@ -244,11 +258,11 @@ namespace Microsoft.BotBuilderSamples
                 }
 
                 //string channelId = turnContext.Activity.TeamsGetChannelId();
-                //var data2 = turnContext.Activity.Value;
-                //var data1 = turnContext.Activity.TeamsGetMeetingInfo();
-                var data3 = turnContext.Activity.ChannelData;
+                var data2 = turnContext.Activity.Value;
                 var data4 = turnContext.Activity.TeamsGetTeamInfo();
-                //var data5 = turnContext.Activity.TeamsGetSelectedChannelId();
+                var data1 = turnContext.Activity.TeamsGetMeetingInfo()?.Id;
+                var data3 = turnContext.Activity.ChannelData;
+                var data5 = turnContext.Activity.TeamsGetSelectedChannelId();
 
                 string teamId, channelId;
 
