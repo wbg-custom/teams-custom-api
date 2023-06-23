@@ -281,7 +281,8 @@ namespace Microsoft.BotBuilderSamples
                 //else
                 //{
 
-                teamId = data4 != null ? data4.AadGroupId : "";
+                //teamId = data4 != null ? data4.AadGroupId : "";
+                teamId = data4?.AadGroupId ?? "";
                 channelId = data3.channel?.id != null ? data3.channel?.id : data3?.meeting?.id;
                 //}
                 //string str2 = turnContext.Activity.TeamsGetSelectedChannelId();
@@ -594,7 +595,7 @@ namespace Microsoft.BotBuilderSamples
                     Type = "continue",
                     Value = new TaskModuleTaskInfo()
                     {
-                        Height = 300,
+                        Height = 350,
                         Width = 475,
                         Title = "Upload photo to OneDrive",
                         Url = _siteUrl + "/test/UploadPhoto",
@@ -613,6 +614,7 @@ namespace Microsoft.BotBuilderSamples
             var data3 = turnContext.Activity.ChannelData;
             var data4 = turnContext.Activity.TeamsGetTeamInfo();
             teamId = data4 != null ? data4.AadGroupId : "";
+            teamId = data4?.AadGroupId??"";
             channelId = data3.channel?.id != null ? data3.channel?.id : data3?.meeting?.id;
 
             if (!string.IsNullOrEmpty(channelId))//(teamDetails != null)
@@ -643,7 +645,7 @@ namespace Microsoft.BotBuilderSamples
                         CreatedBy = createdBy
                     };
                     inputObj.Name = fileName;
-                    AzureSearchHelper.AddAzureSearchIndex(inputObj, imgUrl);
+                    await AzureSearchHelper.AddAzureSearchIndex(inputObj, imgUrl);
                 }
 
                 var card = new ThumbnailCard

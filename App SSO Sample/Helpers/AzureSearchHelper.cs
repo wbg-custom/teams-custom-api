@@ -11,8 +11,21 @@ namespace App_SSO_Sample.Helpers
 {
     public class AzureSearchHelper
     {
-        public static Tuple<bool, string> AddAzureSearchIndex(FileUploadInputObj objInputData, string fileUrl)
+        public static async Task<Tuple<bool, string>> AddAzureSearchIndex(FileUploadInputObj objInputData, string fileUrl)
         {
+            if(objInputData.tags == null || objInputData.tags.Count == 0)
+            {
+                string fileExtension = Path.GetExtension(fileUrl);
+                if (!string.IsNullOrWhiteSpace(fileExtension))
+                {
+                    fileExtension = fileExtension.ToLower().Replace(".", "");
+                    if(fileExtension == "jpeg" || fileExtension == "jpg" || fileExtension == "png")
+                    {
+                        objInputData.tags = await AzurePhotoMetadata.ImageMetada(fileUrl);
+                    }
+                }
+            }
+
             TeamPhotosIndexFile objIndexFile = new TeamPhotosIndexFile()
             {
                 id= Guid.NewGuid().ToString(),

@@ -21,6 +21,9 @@ namespace TeamsTabSSO.Constants
         public static string AadSPInstance { get { return "https://accounts.accesscontrol.windows.net/{0}/tokens/OAuth/2"; } }
         public static string AadSP1Instance { get { return "https://accounts.accesscontrol.windows.net/{0}"; } }
         public static string AadSP2Instance { get { return "https://login.microsoftonline.com/wbgcustomoutlook.onmicrosoft.com/oauth2/v2.0/token"; } }
+
+        public static string AzurePhotoMetadataKey { get { return "5f0a28176ad4464a85f9461f1915723f"; } }
+        public static string AzurePhotoMetadataEndPoint { get { return "https://cv-extract-photo-object.cognitiveservices.azure.com/"; } }
     }
     public static class AzureStorageConstants
     {

@@ -109,7 +109,7 @@ namespace TeamsAuthSSO.Controllers
                         {
                             Response.StatusCode = (int)HttpStatusCode.OK;
                             inputObj.Name = fileName;
-                            AzureSearchHelper.AddAzureSearchIndex(inputObj, result);
+                            await AzureSearchHelper.AddAzureSearchIndex(inputObj, result);
                         }
                         else Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         return Json(result);
@@ -167,7 +167,7 @@ namespace TeamsAuthSSO.Controllers
                     {
                         Response.StatusCode = (int)HttpStatusCode.OK;
                         inputObj.Name = fileName;
-                        AzureSearchHelper.AddAzureSearchIndex(inputObj, result);
+                        await AzureSearchHelper.AddAzureSearchIndex(inputObj, result);
                     }
                     else Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     return Json(result);
