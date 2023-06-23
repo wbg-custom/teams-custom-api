@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
+﻿
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 
@@ -8,7 +6,7 @@ namespace TeamsTabSSO.Helpers
 {
     public class AzurePhotoMetadata
     {
-        public static async Task<List<string>> ImageMetada(string imageUrl)
+        public static async Task<List<string>> ImageMetadata(string imageUrl)
         {
             List<string> returnLst = new List<string>();//AzureCredentials
             // Create a client

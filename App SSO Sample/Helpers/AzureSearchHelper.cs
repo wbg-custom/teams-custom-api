@@ -21,7 +21,7 @@ namespace App_SSO_Sample.Helpers
                     fileExtension = fileExtension.ToLower().Replace(".", "");
                     if(fileExtension == "jpeg" || fileExtension == "jpg" || fileExtension == "png")
                     {
-                        objInputData.tags = await AzurePhotoMetadata.ImageMetada(fileUrl);
+                        objInputData.tags = await AzurePhotoMetadata.ImageMetadata(fileUrl);
                     }
                 }
             }
