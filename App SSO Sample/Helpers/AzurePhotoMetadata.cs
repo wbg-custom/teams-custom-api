@@ -26,7 +26,7 @@ namespace TeamsTabSSO.Helpers
                 //Console.WriteLine($"{tag.Name} {tag.Confidence}");
                 if (!returnLst.Contains(tag.Name))
                 {
-                    returnLst.Add(tag.Name);
+                    returnLst.Add($"{tag.Name}:{tag.Confidence}");
                 }
             }
 
