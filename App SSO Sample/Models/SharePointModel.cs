@@ -10,9 +10,12 @@
         public string ChannelId { get; set; }
         public string? ItemId { get; set; }
         public string Name { get; set; }
+        public string? extension { get; set; }
         public string? CreatedBy { get; set; }
         public List<string>? tags { get; set; }
         public IFormFile? file { get; set; }
         public string? base64 { get; set; }
+        //public string? latitude { get; set; }
+        //public string? longitude { get; set; }
     }
 }

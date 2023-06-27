@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Drawing;
 using System.Net;
 using TeamsAuthSSO.Models;
 using TeamsTabSSO.Constants;
 using TeamsTabSSO.Helpers;
+//using Windows.Storage.FileProperties;
 
 namespace TeamsAuthSSO.Controllers
 {
@@ -98,22 +100,30 @@ namespace TeamsAuthSSO.Controllers
 
                 //if (tokenObj.Item1)
                 //{
-                    using (var ms = new MemoryStream())
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    inputObj.file.CopyTo(ms);
+                    byte[] fileBytes = ms.ToArray();
+                    string fileName = inputObj.file.FileName;
+                    AzurestorageHelper objAzureStorage = new AzurestorageHelper();
+                    string result = await objAzureStorage.UploadFromBinaryDataAsync($"{inputObj.TeamId}/{inputObj.ChannelId}/{fileName}", fileBytes);
+                    if (!string.IsNullOrEmpty(result))
                     {
-                        inputObj.file.CopyTo(ms);
-                        byte[] fileBytes = ms.ToArray();
-                        string fileName = inputObj.file.FileName;
-                        AzurestorageHelper objAzureStorage = new AzurestorageHelper();
-                        string result = await objAzureStorage.UploadFromBinaryDataAsync($"{inputObj.TeamId}/{inputObj.ChannelId}/{fileName}", fileBytes);
-                        if (!string.IsNullOrEmpty(result))
-                        {
+                        //using (Bitmap bitmap = new(ms))
+                        //{
+                        //    byte[] latitude = bitmap.PropertyItems.Single(j => j.Id == 4).Value?? null;
+                        //    inputObj.latitude = latitude != null ? System.Text.Encoding.UTF8.GetString(latitude) : "";
+                        //    byte[] longitude = bitmap.PropertyItems.Single(j => j.Id == 2).Value ?? null;
+                        //    inputObj.longitude = longitude != null ? System.Text.Encoding.UTF8.GetString(longitude) : "";
+
                             Response.StatusCode = (int)HttpStatusCode.OK;
                             inputObj.Name = fileName;
                             await AzureSearchHelper.AddAzureSearchIndex(inputObj, result);
-                        }
-                        else Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                        return Json(result);
+                        //}
                     }
+                    else Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return Json(result);
+                }
                 //}
                 //else
                 //{
@@ -159,12 +169,15 @@ namespace TeamsAuthSSO.Controllers
                 //using (var ms = new MemoryStream())
                 //{
                 //    inputObj.file.CopyTo(ms);
+                    inputObj.base64 = inputObj.base64.Replace("data:video/mp4;base64,", "");
                     byte[] fileBytes = Convert.FromBase64String(inputObj.base64);
-                    string fileName = string.Format("Capture{0:YYYYMMddHHmm}{1}.jpg", DateTime.Now, Guid.NewGuid());
+                    string extension = string.IsNullOrEmpty(inputObj.extension) ? "jpg" : inputObj.extension;
+                    string fileName = string.Format("Capture{0:YYYYMMddHHmm}{1}.{2}", DateTime.Now, Guid.NewGuid(), extension);
                     AzurestorageHelper objAzureStorage = new AzurestorageHelper();
                     string result = await objAzureStorage.UploadFromBinaryDataAsync($"{inputObj.TeamId}/{inputObj.ChannelId}/{fileName}", fileBytes);
                     if (!string.IsNullOrEmpty(result))
                     {
+                    //ImageProperties imageProperties;
                         Response.StatusCode = (int)HttpStatusCode.OK;
                         inputObj.Name = fileName;
                         await AzureSearchHelper.AddAzureSearchIndex(inputObj, result);
