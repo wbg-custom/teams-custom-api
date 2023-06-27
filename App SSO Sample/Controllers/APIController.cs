@@ -160,7 +160,7 @@ namespace TeamsAuthSSO.Controllers
                 //{
                 //    inputObj.file.CopyTo(ms);
                     byte[] fileBytes = Convert.FromBase64String(inputObj.base64);
-                    string fileName = string.Format("Capture{0:YYYYMMddHHmm}{1}", DateTime.Now, Guid.NewGuid());
+                    string fileName = string.Format("Capture{0:YYYYMMddHHmm}{1}.jpg", DateTime.Now, Guid.NewGuid());
                     AzurestorageHelper objAzureStorage = new AzurestorageHelper();
                     string result = await objAzureStorage.UploadFromBinaryDataAsync($"{inputObj.TeamId}/{inputObj.ChannelId}/{fileName}", fileBytes);
                     if (!string.IsNullOrEmpty(result))
